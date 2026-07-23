@@ -26,10 +26,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # NEXT_PUBLIC_* are inlined at build time — runtime env alone is not enough for the client bundle.
+      args:
+        NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:-}
+        NEXT_PUBLIC_APP_BASE_URL: ${NEXT_PUBLIC_APP_BASE_URL:-}
+        NEXT_PUBLIC_LEDGER_DAPP_IDENTIFIER: ${NEXT_PUBLIC_LEDGER_DAPP_IDENTIFIER:-}
+        NEXT_PUBLIC_LEDGER_WALLET_PROVIDER_API_KEY: ${NEXT_PUBLIC_LEDGER_WALLET_PROVIDER_API_KEY:-}
     container_name: convixa-app
     restart: unless-stopped
-    expose:
-      - "3000"
+    # Published for local full-stack access (http://localhost:3000).
+    # Production blue-green deploy.sh routes via Caddy instead.
+    ports:
+      - "3000:3000"
     environment:
       # Database connection (connects to postgres service)
       DATABASE_URL: postgresql://convixa:${POSTGRES_PASSWORD}@postgres:5432/convixa
@@ -47,6 +55,13 @@ services:
 
       # Optional: WalletConnect
       NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:-}
+
+      # Optional: Ledger Wallet Provider (baked at build for NEXT_PUBLIC_*)
+      NEXT_PUBLIC_LEDGER_DAPP_IDENTIFIER: ${NEXT_PUBLIC_LEDGER_DAPP_IDENTIFIER:-}
+      NEXT_PUBLIC_LEDGER_WALLET_PROVIDER_API_KEY: ${NEXT_PUBLIC_LEDGER_WALLET_PROVIDER_API_KEY:-}
+
+      # Optional: Safe Transaction Service API key (strongly recommended — avoids 429s on inventory txs)
+      SAFE_API_KEY: ${SAFE_API_KEY:-}
 
       # Optional: Resend API for emails
       RESEND_API_KEY: ${RESEND_API_KEY:-}

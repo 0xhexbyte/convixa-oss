@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { SettingsSubNav } from "@/components/settings-subnav";
+import { InventorySubNav } from "@/components/inventory-subnav";
 import type { DashboardNavVisibility } from "@/lib/dashboard-nav-access";
 import {
   hasOrganizationNavItems,
@@ -99,8 +100,11 @@ export function DashboardNav({
   const pathname = usePathname();
   const [alertsFiringCount, setAlertsFiringCount] = useState(0);
   const [settingsHovered, setSettingsHovered] = useState(false);
+  const [inventoryHovered, setInventoryHovered] = useState(false);
   const settingsContainerRef = useRef<HTMLDivElement>(null);
+  const inventoryContainerRef = useRef<HTMLDivElement>(null);
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inventoryLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { organization, signer } = navVisibility;
   const showOrgSection = hasOrganizationNavItems(navVisibility);
@@ -117,6 +121,20 @@ export function DashboardNav({
   const handleSettingsLeave = useCallback(() => {
     leaveTimerRef.current = setTimeout(() => {
       setSettingsHovered(false);
+    }, 150);
+  }, []);
+
+  const handleInventoryEnter = useCallback(() => {
+    if (inventoryLeaveTimerRef.current) {
+      clearTimeout(inventoryLeaveTimerRef.current);
+      inventoryLeaveTimerRef.current = null;
+    }
+    setInventoryHovered(true);
+  }, []);
+
+  const handleInventoryLeave = useCallback(() => {
+    inventoryLeaveTimerRef.current = setTimeout(() => {
+      setInventoryHovered(false);
     }, 150);
   }, []);
 
@@ -158,12 +176,20 @@ export function DashboardNav({
             />
           )}
           {organization.inventory && (
-            <RailIcon
-              href="/dashboard/inventory"
-              icon={Archive}
-              label="Inventory"
-              active={isActive("/dashboard/inventory")}
-            />
+            <div
+              ref={inventoryContainerRef}
+              className="relative w-full flex justify-center group-hover:justify-stretch"
+              onMouseEnter={handleInventoryEnter}
+              onMouseLeave={handleInventoryLeave}
+            >
+              <RailIcon
+                href="/dashboard/inventory"
+                icon={Archive}
+                label="Inventory"
+                active={isActive("/dashboard/inventory")}
+              />
+              <InventorySubNav visible={inventoryHovered} />
+            </div>
           )}
           {organization.alerts && (
             <RailIcon

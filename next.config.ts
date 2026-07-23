@@ -21,7 +21,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.reown.com",
-      "connect-src 'self' https://api.safe.global https://*.walletconnect.org https://api.web3modal.org https://*.web3modal.org https://pulse.walletconnect.org https://eth.merkle.io wss:",
+      "connect-src 'self' https://api.safe.global https://*.safe.global https://safe-transaction-polygon.safe.global https://*.walletconnect.org https://api.web3modal.org https://*.web3modal.org https://pulse.walletconnect.org https://eth.merkle.io https://*.api.live.ledger.com https://*.ledger.com wss:",
       "frame-src 'self' https://verify.walletconnect.com https://verify.walletconnect.org https://secure.walletconnect.com https://secure.walletconnect.org",
       "frame-ancestors 'none'",
     ].join("; "),
@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
   // Enable standalone output for Docker deployments
   output: "standalone",
   // Keep postgres driver on server only (avoid bundling resolution issues)
-  serverExternalPackages: ["postgres"],
+  serverExternalPackages: ["postgres", "@safe-global/protocol-kit", "@safe-global/api-kit"],
   // workerThreads removed — incompatible with custom webpack functions in Next.js 15.5.
   // Webpack functions (resolve.fallback) cannot be serialized across worker threads,
   // causing DataCloneError. The Next.js persistent cache (convixa-nextjs-build-cache)
@@ -44,6 +44,16 @@ const nextConfig: NextConfig = {
       "@react-native-async-storage/async-storage": false,
       "pino-pretty": false,
     };
+
+    // Ledger ships Tailwind v4 CSS using @layer base/components/utilities.
+    // Tailwind v3's PostCSS plugin rejects those unless @tailwind is present.
+    // Rename layers before PostCSS so the precompiled stylesheet builds cleanly.
+    config.module.rules.unshift({
+      test: /[\\/]node_modules[\\/]@ledgerhq[\\/]ledger-wallet-provider[\\/].*\.css$/,
+      enforce: "pre",
+      use: [require.resolve("./scripts/ledger-css-layer-fix-loader.cjs")],
+    });
+
     return config;
   },
   async headers() {

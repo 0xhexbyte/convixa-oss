@@ -7,6 +7,7 @@ import { ChevronRight } from "lucide-react";
 const PATH_LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   inventory: "Inventory",
+  transactions: "Transactions",
   safes: "Safes",
   alerts: "Alerts",
   teams: "Teams",

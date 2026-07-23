@@ -6,13 +6,15 @@ Convixa helps organizations operate multisigs according to [SEAL Secure Multisig
 
 ## Read-only boundary
 
-Convixa is a **visibility and governance** layer. It does **not**:
+Convixa is primarily a **visibility and governance** layer. It does **not**:
 
-- Sign or execute multisig transactions
-- Change thresholds, owners, guards, or modules on-chain
+- Custody private keys
+- **Execute** multisig transactions on-chain
 - Auto-remediate misconfigurations
 
-Users sign in Safe App or other wallets. Convixa detects, documents, scores, and alerts.
+**Propose (optional):** From Inventory → Transactions, a connected wallet that is a Safe owner may **propose** owner-management transactions (add / remove / rotate signer) to the Safe Transaction Service. Other owners still confirm and execute in Safe{Wallet}. Convixa never broadcasts an execution.
+
+Users sign and execute in Safe App or other wallets. Convixa detects, documents, scores, alerts, and can optionally help draft owner-change proposals.
 
 ## SEAL principles mapped to Convixa
 

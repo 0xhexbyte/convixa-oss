@@ -1,6 +1,6 @@
 # Convixa OSS edition
 
-**Self-hosted inventory and governance for [Safe](https://safe.global) multisigs.** Deploy on your infrastructure — teams, RBAC, alerts, pre-sign checklists, and SEAL-aligned security workflows. **Read-only:** Convixa does not sign or execute transactions.
+**Self-hosted inventory and governance for [Safe](https://safe.global) multisigs.** Deploy on your infrastructure — teams, RBAC, alerts, pre-sign checklists, and SEAL-aligned security workflows. Convixa does **not custody keys or execute** transactions. Optionally, connected wallets can **propose** owner-change Safe transactions (add / remove / rotate signer) from Inventory → Transactions; execution still happens in Safe{Wallet}.
 
 > **Edition:** This repository is the open-source **Convixa OSS edition**. It is structured around [SEAL Secure Multisig Best Practices](https://frameworks.securityalliance.org/wallet-security/secure-multisig-best-practices/) but is **not affiliated with or endorsed by** Security Alliance.
 
@@ -9,7 +9,7 @@
 ## Features
 
 - **Org & teams:** Create an org, create teams (e.g. Finance, Ops), assign team leads.
-- **Inventory:** Add Safe addresses by network (Ethereum, Base, Arbitrum, etc.); optional name and notes.
+- **Inventory:** Add Safe addresses by network (Ethereum, Base, Arbitrum, etc.); optional name and notes. Inventory → Transactions includes a **Propose transaction** wizard for add/remove/rotate signer across selected Safes.
 - **Safe data:** Fetches threshold, signers, pending count, and last activity from [Safe Transaction Service API](https://docs.safe.global/core-api/transaction-service-overview). Set `SAFE_API_KEY` in `.env` for authenticated access (recommended for production and tunnel testing to avoid rate limits; see [How to use API Keys](https://docs.safe.global/core-api/how-to-use-api-keys)).
 - **Refresh:** On-demand refresh of Safe data; cached in DB.
 - **Export:** CSV export of inventory (address, network, name, team, threshold, signers, etc.).
@@ -21,8 +21,8 @@
 - **Next.js 15** (App Router), TypeScript, Tailwind CSS
 - **PostgreSQL** + **Drizzle ORM** – production-ready database
 - **NextAuth** — email/password (Credentials) and **optional Google sign-in** when `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` are set
-- **Wallets (optional):** RainbowKit + WalletConnect for connect flows; SIWE-backed link-wallet APIs under `src/app/api/profile/` and settings UI
-- **Safe API** (read-only)
+- **Wallets (optional):** RainbowKit + WalletConnect for connect flows; optional [Ledger Wallet Provider](https://developers.ledger.com/docs/ledger-wallet-provider/overview) (`NEXT_PUBLIC_LEDGER_WALLET_PROVIDER_API_KEY`) for direct USB/BT Ledger; SIWE-backed link-wallet APIs under `src/app/api/profile/` and settings UI
+- **Safe API** (inventory/alerts read path) + optional in-app **propose** of owner-change txs via Protocol Kit (user wallet signs; service relay with `SAFE_API_KEY`)
 
 Commands below use `npm run …`; the repo includes `package-lock.json` (`npm ci` in Docker). You can use **pnpm** or **yarn** locally if you prefer.
 

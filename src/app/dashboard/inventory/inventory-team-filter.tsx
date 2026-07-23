@@ -6,12 +6,22 @@ import { cn } from "@/lib/cn";
 type Props = {
   teams: { teamId: string; teamName: string }[];
   currentTeamId: string | null;
+  /** Defaults to /dashboard/inventory */
+  baseHref?: string;
 };
 
-export function InventoryTeamFilter({ teams, currentTeamId }: Props) {
-  const baseHref = "/dashboard/inventory";
-
+export function InventoryTeamFilter({
+  teams,
+  currentTeamId,
+  baseHref = "/dashboard/inventory",
+}: Props) {
   if (teams.length <= 1) return null;
+
+  function hrefFor(teamId: string | null): string {
+    if (!teamId) return baseHref;
+    const sep = baseHref.includes("?") ? "&" : "?";
+    return `${baseHref}${sep}teamId=${teamId}`;
+  }
 
   return (
     <div
@@ -20,7 +30,7 @@ export function InventoryTeamFilter({ teams, currentTeamId }: Props) {
       aria-label="Filter by team"
     >
       <Link
-        href={baseHref}
+        href={hrefFor(null)}
         className={cn(
           "rounded-md px-2.5 py-1 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
           currentTeamId === null
@@ -35,7 +45,7 @@ export function InventoryTeamFilter({ teams, currentTeamId }: Props) {
         return (
           <Link
             key={t.teamId}
-            href={`${baseHref}?teamId=${t.teamId}`}
+            href={hrefFor(t.teamId)}
             className={cn(
               "rounded-md px-2.5 py-1 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
               isActive
